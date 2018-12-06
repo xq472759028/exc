@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<style>
+    *{margin: 0;padding: 0}
+    main{width: 1200px;margin: 0 auto;border: 1px solid #ccc}
+    table{width: 100%;table-layout: fixed;text-align: center}
+    h1{font-size: 36px;color: #000;text-align: center}
+    tr{ width:100%;  height: 40px;  border-bottom: 1px solid #000;  box-sizing: border-box; }
+    th,td{width: 20%;height: 40px;border: 1px solid #ccc;box-sizing: border-box;line-height: 40px}
+    .add{width: 170px;height: 40px;margin: 0 auto;text-align: center;background: red;color: #fff;line-height: 40px;font-size: 20px;cursor: pointer}
+    .del{width: 120px;height: 30px;margin: 0 auto;background: red;color: #fff;text-align: center;line-height: 30px;cursor: pointer}
+</style>
+<main>
+    <h1>人员信息</h1>
+    <table cellspacing="0">
+        <tr>
+            <th>编号</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>电话</th>
+            <th>操作</th>
+        </tr>
+
+    </table>
+    <div class="add">添加</div>
+</main>
+</body>
+</html>
+<script>
+    let tbody=document.querySelector("tbody");
+    let add=document.querySelector(".add");
+    let arr=[];
+//    let str=[
+//        {id:1,num:'001',name:'小明锐',age:12,tel:'12345678900'},
+//        {id:2,num:'002',name:'韩老师',age:12,tel:'12345678900'}
+//    ];
+//    localStorage.student=JSON.stringify(str);
+    let newid;
+    if(localStorage.student){
+        arr=JSON.parse(localStorage.student);
+        newid=arr[arr.length-1].id+1;
+    }else {
+        arr=[];
+        newid=1
+    }
+    arr.forEach(function (val) {
+        tbody.innerHTML+=`  <tr id="${val.id}">
+                                <td type="num">${val.num}</td>
+                                <td type="name">${val.name}</td>
+                                <td type="age">${val.age}</td>
+                                <td type="tel">${val.tel}</td>
+                                <td><div class="del">删除</div></td>
+                            </tr>`
+    });
+    add.onclick=function (e) {
+        tbody.innerHTML+=`<tr id="${newid}">
+                            <td type="num"></td>
+                            <td type="name"></td>
+                            <td type="age"></td>
+                            <td type="tel"></td>
+                            <td><div class="del">删除</div></td>
+                        </tr>`;
+        arr.push({id:newid,num:'',name:'',age:'',tel:''});
+        localStorage.student=JSON.stringify(arr);
+        newid++;
+        localStorage.newid=newid;
+    };
+    tbody.onclick=function (e) {
+        let obj=e.target;
+        if(obj.classList.contains('del')){
+            let objtr=obj.parentNode.parentNode;
+            objtr.parentNode.removeChild(objtr);
+            id=objtr.id;
+            let ids=arr.findIndex(function (val) {
+                return val.id==id;
+            });
+            arr.splice(ids,1);
+            localStorage.student=JSON.stringify(arr);
+        }else if(obj.nodeName=='TD'&&obj.children.length=='') {
+            let input=document.createElement('input');
+            let val=obj.innerHTML;
+            obj.innerHTML='';
+            input.value=val;
+            obj.appendChild(input);
+            input.focus();
+            input.onblur=function () {
+                if(val==input.value){
+                    obj.innerHTML=val;
+                }else {
+                    obj.innerHTML=this.value;
+                    let type=obj.getAttribute('type');
+                    let index=arr.findIndex(val=>obj.parentNode.id==val.id);
+                    arr[index][type]=this.value;
+                    localStorage.student=JSON.stringify(arr);
+                }
+            };
+
+        }
+    }
+</script>
